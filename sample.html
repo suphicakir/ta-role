@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TA-ROLE Röle Bilgileri</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    #map { height: 400px; width: 100%; }
+    .highlight { background-color: #ffe082 !important; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">TA-ROLE</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#frekanslar">Röle Bilgileri</a></li>
+        <li class="nav-item"><a class="nav-link" href="#harita">Harita</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-4">
+  <h1 class="text-center mb-4">TA-ROLE Röle Frekans Bilgileri</h1>
+
+  <div id="frekanslar" class="table-responsive">
+    <table class="table table-striped table-bordered" id="repeaterTable">
+      <thead class="table-primary">
+        <tr>
+          <th>Röle Adı</th>
+          <th>Frekans</th>
+          <th>Mod</th>
+          <th>Tone</th>
+          <th>Konum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-id="istanbul">
+          <td>İstanbul Tekstilkent</td>
+          <td>439.200 MHz</td>
+          <td>Analog</td>
+          <td>88.5 Hz</td>
+          <td>İstanbul</td>
+        </tr>
+        <tr data-id="ankara">
+          <td>Ankara Kızılay</td>
+          <td>145.600 MHz</td>
+          <td>Digital</td>
+          <td>77.0 Hz</td>
+          <td>Ankara</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="harita" class="text-center mt-5 mb-3">Röle Haritası</h2>
+  <div id="map"></div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  // Harita başlat
+  var map = L.map('map').setView([39.0, 35.0], 6);
+
+  // OpenStreetMap katmanı
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap katkıda bulunanlar'
+  }).addTo(map);
+
+  // Özel ikonlar
+  var icons = {
+    Analog: L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/1006/1006555.png',
+      iconSize: [30, 30]
+    }),
+    Digital: L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/565/565547.png',
+      iconSize: [30, 30]
+    }),
+    VHF: L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/3419/3419215.png',
+      iconSize: [30, 30]
+    }),
+    UHF: L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/3419/3419209.png',
+      iconSize: [30, 30]
+    })
+  };
+
+  // Röleler
+  var repeaters = [
+    {
+      id: "istanbul",
+      coords: [41.077, 28.890],
+      popup: 'İstanbul Tekstilkent Rölesi<br>439.200 MHz Analog 88.5 Hz',
+      type: 'Analog'
+    },
+    {
+      id: "ankara",
+      coords: [39.920, 32.854],
+      popup: 'Ankara Kızılay Rölesi<br>145.600 MHz Digital 77.0 Hz',
+      type: 'Digital'
+    }
+  ];
+
+  // Marker ekle ve tablo vurgusu
+  repeaters.forEach(function(rep) {
+    var marker = L.marker(rep.coords, {icon: icons[rep.type]}).addTo(map)
+      .bindPopup(rep.popup);
+
+    marker.on('click', function() {
+      // Tablodaki tüm vurguları kaldır
+      document.querySelectorAll('#repeaterTable tbody tr').forEach(function(row) {
+        row.classList.remove('highlight');
+      });
+      // İlgili satırı vurgula
+      var targetRow = document.querySelector('#repeaterTable tbody tr[data-id="' + rep.id + '"]');
+      if (targetRow) {
+        targetRow.classList.add('highlight');
+        targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  });
+
+</script>
+
+</body>
+</html>
